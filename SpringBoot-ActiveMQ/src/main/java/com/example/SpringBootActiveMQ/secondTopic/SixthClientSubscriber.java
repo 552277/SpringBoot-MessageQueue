@@ -64,6 +64,7 @@ public class SixthClientSubscriber {
                 }
             });
 
+//            connection.close(); // 如果关闭连接，每次执行一次程序就会停止，且每次执行时，只有secondConsumer消费者消费队列中的消息，thirdConsumer的队列中即使有消息，也不会进行消费
         } catch (Exception e) {
             e.printStackTrace();
         }

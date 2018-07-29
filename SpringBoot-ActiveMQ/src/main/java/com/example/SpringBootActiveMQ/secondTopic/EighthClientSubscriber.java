@@ -64,6 +64,8 @@ public class EighthClientSubscriber {
 
                 }
             });
+//            session.close(); // 如果关闭，程序仍会继续执行，但是收不到队列推送的消息
+//            connection.close();  // 如果关闭，程序会停止运行
         } catch (Exception e) {
             e.printStackTrace();
         }
