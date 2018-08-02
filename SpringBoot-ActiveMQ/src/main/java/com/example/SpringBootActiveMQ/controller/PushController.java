@@ -1,8 +1,9 @@
 package com.example.SpringBootActiveMQ.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.SpringBootActiveMQ.bean.User;
-import com.example.SpringBootActiveMQ.utils.ActiveMQUtils;
 import com.example.SpringBootActiveMQ.service.PushService;
+import com.example.SpringBootActiveMQ.utils.ActiveMQUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -26,10 +27,14 @@ public class PushController {
         if(StringUtils.isEmpty(userId) || Strings.isEmpty(message)) {
             throw new Exception("参数有误!");
         }
-        ActiveMQUtils.pushTextMessage("id" + userId, message);
-        return true;
+        return ActiveMQUtils.pushTextMessage("id" + userId, message);
     }
 
+    /**
+     * 目前传递对象消息通过json实现
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/object", method = RequestMethod.POST)
     public boolean pushObjectMessage(HttpServletRequest request) {
 
@@ -40,11 +45,7 @@ public class PushController {
         user.setName("Weichang Zhong");
         user.setImageObj("imageUrl");
         user.setMessage("你好，在干嘛呢");
-        ActiveMQUtils.pushObjectMessage("id" + senderId, user);
-
-        return true;
+        String jsonStr = JSONObject.toJSONString(user);
+        return ActiveMQUtils.pushTextMessage("id" + senderId, jsonStr);
     }
-
-
-
 }

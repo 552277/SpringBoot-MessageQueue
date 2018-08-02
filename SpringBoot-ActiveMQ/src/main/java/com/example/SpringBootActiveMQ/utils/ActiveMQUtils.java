@@ -1,5 +1,6 @@
 package com.example.SpringBootActiveMQ.utils;
 
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class ActiveMQUtils {
      * @param topic
      * @param message
      */
-    public static void pushTextMessage(String topic, String message) {
+    public static boolean pushTextMessage(String topic, String message) {
         try {
             // Session： 一个发送或接收消息的线程
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);  //自动确认
@@ -77,17 +78,20 @@ public class ActiveMQUtils {
             producer.send(textMessage);
             logger.info("消息对象推送成功：" + message);
             session.close();
+            return true;
         }catch (JMSException e) {
             logger.error("消息对象推送失败:" + message, e);
         }
+        return false;
     }
 
     /**
-     * 推送对象消息
+     * 推送对象消息, 目前mqtt已不支持activeMQ传递序列化的对象，所以此方法如果不进行处理，无法正常与消费者通信，
+     * 所以项目中可将对象转为json字符串进行传弟对象通信
      * @param topic
      * @param object
      */
-    public static void pushObjectMessage(String topic, Serializable object) {
+    public static boolean pushObjectMessage(String topic, Serializable object) {
         try {
             // Session： 一个发送或接收消息的线程
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);  //自动确认
@@ -97,7 +101,7 @@ public class ActiveMQUtils {
 
             // 设置不持久化，可以更改
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            ObjectMessage objectMessage = session.createObjectMessage(object);
+            ObjectMessage objectMessage = session.createObjectMessage();
 //            ActiveMQObjectMessage activeMQObjectMessage = (ActiveMQObjectMessage)session.createObjectMessage();
             objectMessage.setObject(object);
 //            activeMQObjectMessage.setObject(object);
@@ -105,8 +109,10 @@ public class ActiveMQUtils {
 //            producer.send(activeMQObjectMessage);
             logger.info("消息对象推送成功：" + object.toString());
             session.close();
+            return true;
         }catch (JMSException e) {
             logger.error("消息对象推送失败:" + object.toString(), e);
         }
+        return false;
     }
 }

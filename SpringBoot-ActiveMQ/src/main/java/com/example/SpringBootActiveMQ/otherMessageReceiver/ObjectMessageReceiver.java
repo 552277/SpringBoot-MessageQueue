@@ -1,5 +1,6 @@
 package com.example.SpringBootActiveMQ.otherMessageReceiver;
 
+import com.alibaba.fastjson.JSON;
 import com.example.SpringBootActiveMQ.bean.User;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -34,23 +35,19 @@ public class ObjectMessageReceiver {
                 @Override
                 public void onMessage(Message msg) {
 
-                    try {
+                        try {
 
-                        User user = (User) ((ObjectMessage) msg).getObject();
-//                        TextMessage message = (TextMessage) msg;
-//                        ObjectMessage objectMessage = (ObjectMessage)msg;
-//                        ActiveMQObjectMessage activeMQTextMessage = (ActiveMQObjectMessage)msg;
-//                        System.out.println("第六个客户端上的 secondConsumer 收到second_topic消息： " + message.getText());
-//                        System.out.println(activeMQTextMessage.getObject());
-                        ObjectMessage objectMessage = (ObjectMessage)msg;
-                        User user2 = (User)objectMessage.getObject();
+                        TextMessage message = (TextMessage) msg;
+                        // 与生产者约定以json格式传送对象，所以这里需要将json解析为对象
+                        User user = (User) JSON.parseObject(message.getText(), User.class);
+
+                        System.out.println("接收到的用户消息为：" + user.getMessage());
                         System.out.println(user.toString());
                         session.commit();
 
                     } catch (JMSException e) {
                         e.printStackTrace();
                     }
-
                 }
             });
 
